@@ -108,18 +108,22 @@ function pieceWasFoundProtical(availiblePiece, allPieces) {
 // }
 
 function fetchPiecesToLookFor() {
-  let rawdata = fs.readFileSync("pieces.json");
+  let rawdata = fs.readFileSync("parts.json");
+  // console.log(JSON.parse(rawdata));
   return JSON.parse(rawdata);
 }
 //11027
 //11030
 
-const piecesToSearchFor = [{ setNumber: 60374, parts: [6430373] }];
-cron.schedule("*/5 * * * *", () => {
-  //const piecesToSearchFor = fetchPiecesToLookFor();
+cron.schedule("*/1 * * * *", () => {
+  const piecesToSearchFor = fetchPiecesToLookFor().sets;
   console.log("calling API...");
-
-  piecesToSearchFor.forEach((piece) => fetchLegoInfo(piece, piecesToSearchFor));
+  // console.log(piecesToSearchFor);
+  piecesToSearchFor.forEach((piece) => {
+    // console.log("huh");
+    console.log(piece);
+    fetchLegoInfo(piece, piecesToSearchFor);
+  });
 });
 
 /**
