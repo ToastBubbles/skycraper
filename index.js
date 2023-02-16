@@ -2,14 +2,14 @@ let axios = require("axios");
 var cron = require("node-cron");
 const fs = require("fs");
 const { keys } = require("./keys");
-// const sgMail = require("@sendgrid/mail");
+const sgMail = require("@sendgrid/mail");
 require("dotenv").config();
-
-// sgMail.setApiKey(process.env.SEND_GRID_API_KEY);
+// process.env.SEND_GRID_API_KEY
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 let foundParts = [];
 let lookingForParts = fetchPiecesToLookFor();
-console.log(lookingForParts.sets);
+// console.log(lookingForParts.sets);
 
 console.log("started");
 function fetchLegoInfo(LegoObject, showAll = false, allPieces) {
@@ -91,7 +91,7 @@ function pieceWasFoundProtocol(foundPart) {
   const message = `The ${foundPart.description} peice is now avialible!`;
 
   console.log(message);
-  // sendEmail(message);
+  sendEmail(message);
 
   // let updatedList = allPieces.filter(
   //   (piece) => piece.itemNumber != foundPart.itemNumber
@@ -112,10 +112,10 @@ function pieceWasFoundProtocol(foundPart) {
     });
   }
   // 2nd parameter means remove one item only
-  console.log("************** found parts ****************");
-  console.log(foundParts);
-  console.log("************** looking for parts ****************");
-  console.log(lookingForParts.sets[0].parts);
+  // console.log("************** found parts ****************");
+  // console.log(foundParts);
+  // console.log("************** looking for parts ****************");
+  // console.log(lookingForParts.sets[0].parts);
   // }
   ///////////////
   // fs.writeFile("pieces.json", JSON.stringify(updatedList), "utf8", (err) =>
@@ -123,24 +123,26 @@ function pieceWasFoundProtocol(foundPart) {
   // );
 }
 
-// function sendEmail(messageBody) {
-//   let currentTime = new Date();
+function sendEmail(messageBody) {
+  let currentTime = new Date();
+  //process.env.HOST_EMAIL_NAME
+  const msgToSend = {
+    to: keys.email, // Change to your recipient
+    from: keys.sendEmail, // Change to your verified sender
+    subject: `Piece was found at ${currentTime.toLocaleTimeString()}`,
+    text: messageBody,
+  };
 
-//   const msgToSend = {
-//     to: keys.email, // Change to your recipient
-//     from: process.env.HOST_EMAIL_NAME, // Change to your verified sender
-//     subject: `Piece was found at ${currentTime.toLocaleTimeString()}`,
-//     text: messageBody,
-//   };
-
-//   sgMail
-//     .send(msgToSend)
-//     .then(() => {
-//       console.log("Email sent");
-//     })
-//     .catch((error) => {
-//       console.error(error);
-//     });
+  sgMail
+    .send(msgToSend)
+    .then(() => {
+      console.log("Email sent");
+    })
+    .catch((error) => {
+      console.error(error);
+      console.log("dont work");
+    });
+}
 // }
 
 function fetchPiecesToLookFor() {
