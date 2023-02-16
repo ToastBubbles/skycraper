@@ -42,6 +42,8 @@ Clone the project
   git clone https://github.com/ToastBubbles/skyscraper
 ```
 
+Make the keys.js and parts.json in the main directory, fill in desired information.
+
 Navigate to the project directory
 
 ```bash

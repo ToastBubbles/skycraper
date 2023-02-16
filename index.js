@@ -6,6 +6,11 @@ const { keys } = require("./keys");
 require("dotenv").config();
 
 // sgMail.setApiKey(process.env.SEND_GRID_API_KEY);
+
+let foundParts = [];
+let lookingForParts = fetchPiecesToLookFor();
+console.log(lookingForParts.sets);
+
 console.log("started");
 function fetchLegoInfo(LegoObject, showAll = false, allPieces) {
   // console.log(LegoObject.setNumber);
@@ -49,10 +54,10 @@ function handleLegoResponse(responseData, pieceToLookFor, showAll, allPieces) {
       // console.log(brick);
       if (pieceToLookFor.parts.includes(brick.itemNumber)) {
         // console.log(brick);
-        !brick.isSoldOut &&
-          console.log(
-            `${brick.colorFamily} ${brick.description} is available!`
-          );
+        !brick.isSoldOut && pieceWasFoundProtocol(brick);
+        // console.log(
+        //   `${brick.colorFamily} ${brick.description} is available!`
+        // );
         brick.isSoldOut &&
           console.log(
             `${brick.colorFamily} ${brick.description} is NOT available`
@@ -82,25 +87,47 @@ function handleLegoResponse(responseData, pieceToLookFor, showAll, allPieces) {
   //   : console.log(`The ${pieceToLookFor.name} peice is not avialible.`);
 }
 
-function pieceWasFoundProtical(availiblePiece, allPieces) {
-  const message = `The ${availiblePiece.name} peice is now avialible!`;
+function pieceWasFoundProtocol(foundPart) {
+  const message = `The ${foundPart.description} peice is now avialible!`;
 
-  // console.log(message);
+  console.log(message);
   // sendEmail(message);
 
-  let updatedList = allPieces.filter(
-    (piece) => piece.itemNumber != availiblePiece.itemNumber
-  );
-  fs.writeFile("pieces.json", JSON.stringify(updatedList), "utf8", (err) =>
-    err ? console.log("Error", err) : console.log("Updated Pices")
-  );
+  // let updatedList = allPieces.filter(
+  //   (piece) => piece.itemNumber != foundPart.itemNumber
+  // );
+  foundParts.push(foundPart);
+  // lookingForParts.s;
+  // const index = array.indexOf(5);
+  // if (index > -1) {
+  // only splice array when item is found
+  for (let p = 0; p < lookingForParts.sets.length; p++) {
+    lookingForParts.sets[p].parts.forEach((part) => {
+      if (part == foundPart.itemNumber) {
+        lookingForParts.sets[p].parts.splice(
+          lookingForParts.sets[p].parts.indexOf(foundPart.itemNumber),
+          1
+        );
+      }
+    });
+  }
+  // 2nd parameter means remove one item only
+  console.log("************** found parts ****************");
+  console.log(foundParts);
+  console.log("************** looking for parts ****************");
+  console.log(lookingForParts.sets[0].parts);
+  // }
+  ///////////////
+  // fs.writeFile("pieces.json", JSON.stringify(updatedList), "utf8", (err) =>
+  //   err ? console.log("Error", err) : console.log("Updated Pices")
+  // );
 }
 
 // function sendEmail(messageBody) {
 //   let currentTime = new Date();
 
 //   const msgToSend = {
-//     to: "samscamp@live.com", // Change to your recipient
+//     to: keys.email, // Change to your recipient
 //     from: process.env.HOST_EMAIL_NAME, // Change to your verified sender
 //     subject: `Piece was found at ${currentTime.toLocaleTimeString()}`,
 //     text: messageBody,
@@ -125,13 +152,13 @@ function getElementIds(setNumber) {
   let thisSet = { setNumber };
   fetchLegoInfo(thisSet, true);
 }
-getElementIds(11030);
+// getElementIds(60374);
 // getElementIds(4411);
 //11027
 //11030
 
-cron.schedule("*/5 * * * *", () => {
-  const piecesToSearchFor = fetchPiecesToLookFor().sets;
+cron.schedule("*/1 * * * *", () => {
+  const piecesToSearchFor = lookingForParts.sets;
   console.log("calling API...");
   // console.log(piecesToSearchFor);
   piecesToSearchFor.forEach((set) => {
