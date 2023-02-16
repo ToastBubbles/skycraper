@@ -10,27 +10,31 @@ console.log("started");
 function fetchLegoInfo(LegoObject, allPieces) {
   console.log(LegoObject.setNumber);
   axios.defaults.headers.common = {
-    "x-api-key": keys.leg0,
+    "x-api-key": keys.leg1,
   };
-
+  //https://services.slingshot.lego.com/api/v4/lego_historic_product_read/_search
+  // /api/v4/lego_historic_product_read/_search
+  // https://bricksandpieces.services.lego.com/api/v1/bricks/product/${LegoObject.setNumber} //OLD URL
   axios
     .get(
-      `https://bricksandpieces.services.lego.com/api/v1/bricks/product/${LegoObject.setNumber}`,
+      // `https://bricksandpieces.services.lego.com/api/v1/bricks/product/${LegoObject.setNumber}`,
+      "https://services.slingshot.lego.com/api/v4/lego_historic_product_read/_search",
       {
-        params: {
-          country: "US",
-          orderType: "buy",
-        },
+        // params: {
+        //   country: "US",
+        //   orderType: "buy",
+        // },
       }
     )
     .then((res) => {
-      handleLegoResponse(res.data, LegoObject, allPieces);
+      console.log(res.data.hits.hits[0]._source.availability);
+      // handleLegoResponse(res.data, LegoObject, allPieces);
       console.log(LegoObject.setNumber);
     });
 }
 
 function handleLegoResponse(responseData, pieceToLookFor, allPieces) {
-  console.log(responseData);
+  // console.log(responseData.bricks);
   const inStockPieces = responseData.bricks.filter((piece) => !piece.isSoldOut);
   // console.log(inStockPieces);
   // const theChosenPiece = inStockPieces.filter(
@@ -45,7 +49,7 @@ function handleLegoResponse(responseData, pieceToLookFor, allPieces) {
 function pieceWasFoundProtical(availiblePiece, allPieces) {
   const message = `The ${availiblePiece.name} peice is now avialible!`;
 
-  console.log(message);
+  // console.log(message);
   // sendEmail(message);
 
   let updatedList = allPieces.filter(
