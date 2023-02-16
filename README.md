@@ -1,8 +1,23 @@
 # skycraper
 
-get brick availability,
+This application will get part availability info from TLG.
 
-requires a key and a parts.json with the following format:
+## Authors
+
+- [@ToastBubbles](https://www.github.com/ToastBubbles)
+
+## Requirements:
+
+requires a keys.js file...
+
+```bash
+const keys = {
+  leg0: "your_key_here",
+};
+exports.keys = keys;
+```
+
+and a parts.json (requires parent set number)...
 
 ```bash
 {
@@ -17,4 +32,30 @@ requires a key and a parts.json with the following format:
     }
   ]
 }
+```
+
+## How to run:
+
+Clone the project
+
+```bash
+  git clone https://github.com/ToastBubbles/skyscraper
+```
+
+Navigate to the project directory
+
+```bash
+  cd skyscraper
+```
+
+Install dependencies
+
+```bash
+  npm i
+```
+
+Run the project
+
+```bash
+  node index
 ```
