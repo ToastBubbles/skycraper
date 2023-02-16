@@ -7,7 +7,7 @@ require("dotenv").config();
 
 // sgMail.setApiKey(process.env.SEND_GRID_API_KEY);
 console.log("started");
-function fetchLegoInfo(LegoObject, allPieces) {
+function fetchLegoInfo(LegoObject, showAll = false, allPieces) {
   // console.log(LegoObject.setNumber);
   axios.defaults.headers.common = {
     "x-api-key": keys.leg0,
@@ -31,26 +31,35 @@ function fetchLegoInfo(LegoObject, allPieces) {
       }
     )
     .then((res) => {
-      // console.log(res.data.bricks);
-      handleLegoResponse(res.data, LegoObject, allPieces);
+      // console.log(res.statusText);
+      if (res.statusText == "OK") {
+        handleLegoResponse(res.data, LegoObject, showAll, allPieces);
+      }
+      //
       // console.log(LegoObject.setNumber);
     });
 }
 
-function handleLegoResponse(responseData, pieceToLookFor, allPieces) {
+function handleLegoResponse(responseData, pieceToLookFor, showAll, allPieces) {
   // console.log(responseData.bricks);
   const inStockPieces = responseData.bricks.filter((piece) => !piece.isSoldOut);
   const outStockPieces = responseData.bricks.filter((piece) => piece.isSoldOut);
   responseData.bricks.forEach((brick) => {
-    // console.log(brick);
-    if (pieceToLookFor.parts.includes(brick.itemNumber)) {
+    if (!showAll) {
       // console.log(brick);
-      !brick.isSoldOut &&
-        console.log(`${brick.colorFamily} ${brick.description} is available!`);
-      brick.isSoldOut &&
-        console.log(
-          `${brick.colorFamily} ${brick.description} is NOT available`
-        );
+      if (pieceToLookFor.parts.includes(brick.itemNumber)) {
+        // console.log(brick);
+        !brick.isSoldOut &&
+          console.log(
+            `${brick.colorFamily} ${brick.description} is available!`
+          );
+        brick.isSoldOut &&
+          console.log(
+            `${brick.colorFamily} ${brick.description} is NOT available`
+          );
+      }
+    } else {
+      console.log(brick.description, brick.colorFamily, brick.itemNumber);
     }
   });
   // inStockPieces.forEach((part) => {
@@ -112,17 +121,24 @@ function fetchPiecesToLookFor() {
   // console.log(JSON.parse(rawdata));
   return JSON.parse(rawdata);
 }
+function getElementIds(setNumber) {
+  let thisSet = { setNumber };
+  fetchLegoInfo(thisSet, true);
+}
+getElementIds(11030);
+// getElementIds(4411);
 //11027
 //11030
 
-cron.schedule("*/1 * * * *", () => {
+cron.schedule("*/5 * * * *", () => {
   const piecesToSearchFor = fetchPiecesToLookFor().sets;
   console.log("calling API...");
   // console.log(piecesToSearchFor);
-  piecesToSearchFor.forEach((piece) => {
+  piecesToSearchFor.forEach((set) => {
     // console.log("huh");
-    console.log(piece);
-    fetchLegoInfo(piece, piecesToSearchFor);
+    // console.log(piece);
+    // fetchLegoInfo(set, piecesToSearchFor);
+    fetchLegoInfo(set);
   });
 });
 
