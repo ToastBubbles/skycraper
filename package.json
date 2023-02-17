@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@emailjs/browser": "^3.10.0",
     "@sendgrid/mail": "^7.7.0",
     "axios": "^1.2.6",
     "cron": "^2.2.0",

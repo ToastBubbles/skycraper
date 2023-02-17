@@ -4,6 +4,7 @@ const fs = require("fs");
 const { keys } = require("./keys");
 const sgMail = require("@sendgrid/mail");
 require("dotenv").config();
+
 // process.env.SEND_GRID_API_KEY
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -125,13 +126,15 @@ function pieceWasFoundProtocol(foundPart) {
 
 function sendEmail(messageBody) {
   let currentTime = new Date();
-  //process.env.HOST_EMAIL_NAME
+
+  // process.env.HOST_EMAIL_NAME;
   const msgToSend = {
     to: keys.email, // Change to your recipient
     from: keys.sendEmail, // Change to your verified sender
     subject: `Piece was found at ${currentTime.toLocaleTimeString()}`,
     text: messageBody,
   };
+  console.log(msgToSend);
 
   sgMail
     .send(msgToSend)
