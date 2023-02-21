@@ -1,9 +1,7 @@
 {
   "dependencies": {
-    "@emailjs/browser": "^3.10.0",
     "@sendgrid/mail": "^7.7.0",
     "axios": "^1.2.6",
-    "cron": "^2.2.0",
     "node": "^18.13.0",
     "node-cron": "^3.0.2",
     "sendgrid": "^5.2.3"
