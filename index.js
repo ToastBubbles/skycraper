@@ -5,7 +5,8 @@ const { keys } = require("./keys");
 const sgMail = require("@sendgrid/mail");
 require("dotenv").config();
 
-let usingEmailService = !!keys.sg;
+let emailOverride = true; // manually disable email sender
+let usingEmailService = !!keys.sg && emailOverride;
 if (usingEmailService) {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 }
@@ -14,6 +15,7 @@ let foundParts = [];
 let lookingForParts = fetchPiecesToLookFor();
 
 console.log("started");
+!usingEmailService && console.log("\x1b[91mnot using email service...\x1b[0m");
 function fetchLegoInfo(LegoObject, showAll = false, allPieces) {
   axios.defaults.headers.common = {
     "x-api-key": keys.leg0,
@@ -34,9 +36,12 @@ function fetchLegoInfo(LegoObject, showAll = false, allPieces) {
       }
     )
     .then((res) => {
-      // console.log(res.statusText);
       if (res.statusText == "OK") {
         handleLegoResponse(res.data, LegoObject, showAll, allPieces);
+      } else {
+        console.log(
+          `\x1b[90m${LegoObject.setNumber} inventory not available. (${res.statusText})\x1b[0m`
+        );
       }
     });
 }
@@ -47,11 +52,12 @@ function handleLegoResponse(responseData, pieceToLookFor, showAll, allPieces) {
   responseData.bricks.forEach((brick) => {
     if (!showAll) {
       if (pieceToLookFor.parts.includes(brick.itemNumber)) {
-        !brick.isSoldOut && pieceWasFoundProtocol(brick);
+        !brick.isSoldOut &&
+          pieceWasFoundProtocol(brick, pieceToLookFor.setNumber);
 
         brick.isSoldOut &&
           console.log(
-            `${brick.colorFamily} ${brick.description} is NOT available`
+            `(${pieceToLookFor.setNumber}) ${brick.colorFamily} ${brick.description} is NOT available`
           );
       }
     } else {
@@ -60,12 +66,12 @@ function handleLegoResponse(responseData, pieceToLookFor, showAll, allPieces) {
   });
 }
 
-function pieceWasFoundProtocol(foundPart) {
-  const message = `The ${foundPart.description} peice is now avialible!`;
+function pieceWasFoundProtocol(foundPart, set) {
+  const message = `(${set}) The ${foundPart.description} peice is now avialible!`;
 
-  console.log(message);
+  console.log(`\x1b[92m${message}\x1b[0m`);
   if (usingEmailService) {
-    sendEmail(message);
+    sendEmail(message, foundPart);
   }
 
   foundParts.push(foundPart);
@@ -82,7 +88,7 @@ function pieceWasFoundProtocol(foundPart) {
   }
 }
 
-function sendEmail(messageBody) {
+function sendEmail(messageBody, part) {
   let currentTime = new Date();
 
   const msgToSend = {
@@ -90,6 +96,7 @@ function sendEmail(messageBody) {
     from: keys.sendEmail, // Change to your verified sender
     subject: `Piece was found at ${currentTime.toLocaleTimeString()}`,
     text: messageBody,
+    html: `<img src="${part.imageUrl}" />`,
   };
   console.log(msgToSend);
 
@@ -103,7 +110,6 @@ function sendEmail(messageBody) {
       console.log("dont work");
     });
 }
-// }
 
 function fetchPiecesToLookFor() {
   let rawdata = fs.readFileSync("parts.json");
@@ -114,9 +120,6 @@ function getElementIds(setNumber) {
   fetchLegoInfo(thisSet, true);
 }
 // getElementIds(60374);
-// getElementIds(4411);
-//11027
-//11030
 
 cron.schedule("*/1 * * * *", () => {
   const piecesToSearchFor = lookingForParts.sets;
