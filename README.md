@@ -1,6 +1,6 @@
 # skyscraper
 
-This application will get PaB part availability info from TLG.
+This application will get PaB part availability info from TLG, and will optionally send an email notification when a part becomes available.
 
 ## Authors
 
