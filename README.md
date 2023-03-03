@@ -8,7 +8,7 @@ This application will get PaB part availability info from TLG.
 
 ## Requirements:
 
-requires a keys.js file...
+requires a keys.js file... (you can find the key online if you look hard enough 👀)
 
 ```bash
 const keys = {
@@ -21,7 +21,7 @@ const keys = {
 exports.keys = keys;
 ```
 
-and a parts.json (requires parent set number)...
+and a parts.json (requires parent set number and element ID's)...
 
 ```bash
 {
