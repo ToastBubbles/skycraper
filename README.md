@@ -1,6 +1,6 @@
 # skycraper
 
-This application will get part availability info from TLG.
+This application will get PaB part availability info from TLG.
 
 ## Authors
 
