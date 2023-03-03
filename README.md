@@ -1,4 +1,4 @@
-# skycraper
+# skyscraper
 
 This application will get PaB part availability info from TLG.
 
@@ -8,7 +8,7 @@ This application will get PaB part availability info from TLG.
 
 ## Requirements:
 
-requires a keys.js file... (you can find the key online if you look hard enough 👀)
+requires a keys.js file... (you can find a key online if you look hard enough 👀)
 
 ```bash
 const keys = {
